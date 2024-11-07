@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寻宝游戏</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #output {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>欢迎来到寻宝游戏</h1>
+    <button id="startButton">开始游戏</button>
+    <div id="output"></div>
+    <img id="storyImage" src="" alt="Story Image">
+
+    <script>
+        class TreasureMap {
+            static async getInitialClue() {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        resolve("在古老的图书馆里找到了第一个线索...");
+                    }, 1000);
+                });
+            }
+
+            static async decodeAncientScript(clue) {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        resolve("解码成功!宝藏在一座古老的神庙中...");
+                    }, 1500);
+                });
+            }
+
+            static async searchTemple(location) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        const random = Math.random();
+                        if (random < 0.3) {
+                            reject({ message: "糟糕!遇到了神庙守卫!", image: 'guardian.jpg' });
+                        } else if (random < 0.8) {
+                            resolve("你遇到了恶龙!但成功打败了它，找到了一个神秘的箱子...");
+                        } else {
+                            reject({ message: "你遇到了恶龙，并且挑战失败!", image: 'dragon.jpg' });
+                        }
+                    }, 2000);
+                });
+            }
+
+            static async openTreasureBox() {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        const random = Math.random();
+                        if (random < 0.8) {
+                            resolve("恭喜!你找到了传说中的宝藏!");
+                        } else {
+                            reject({ message: "糟糕!宝箱竟然是宝箱怪，你被吃掉了!", image: 'failure.jpg' });
+                        }
+                    }, 1000);
+                });
+            }
+        }
+
+        async function findTreasureAsync() {
+            const outputDiv = document.getElementById('output');
+            const imgElement = document.getElementById('storyImage');
+            outputDiv.innerHTML = "游戏开始..."; // 提供游戏开始的入口状态
+            imgElement.style.display = 'none';
+
+            try {
+                const clue = await TreasureMap.getInitialClue();
+                updateOutputAndImage(clue, 'library.jpg');
+                
+                const location = await TreasureMap.decodeAncientScript(clue);
+                updateOutputAndImage(location, 'temple.jpg');
+                
+                const box = await TreasureMap.searchTemple(location);
+                updateOutputAndImage(box, 'dragon.jpg');
+                
+                const treasure = await TreasureMap.openTreasureBox();
+                updateOutputAndImage(treasure, 'treasure.jpg');
+            } catch (error) {
+                updateOutputAndImage("任务失败: " + error.message, error.image || 'failure.jpg');
+            }
+        }
+
+        function updateOutputAndImage(outcome, imageName) {
+            const outputDiv = document.getElementById('output');
+            const imgElement = document.getElementById('storyImage');
+            
+            outputDiv.innerHTML += outcome + "<br>";
+            if (imageName) {
+                imgElement.src = imageName;
+                imgElement.style.display = 'block';
+            }
+        }
+
+        document.getElementById('startButton').addEventListener('click', findTreasureAsync);
+    </script>
+
+</body>
+</html>
